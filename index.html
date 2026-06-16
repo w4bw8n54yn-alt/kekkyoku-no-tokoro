@@ -1,4 +1,44 @@
-<!DOCTYPE html>
+from pathlib import Path
+import json
+
+songs = [
+  {"mood":"gohome","category":"帰りたくない","song":"誰にも見つけられない星になれたら","artist":"andymori","scene":"家までの道が、少しだけ長く感じる帰り道。","reason":"誰かに見つけてほしいような、見つけられたくないような夜に。まっすぐ帰るだけの日にも、少しだけ物語が残る。","apple":"https://music.apple.com/jp/album/%E8%AA%B0%E3%81%AB%E3%82%82%E8%A6%8B%E3%81%A4%E3%81%91%E3%82%89%E3%82%8C%E3%81%AA%E3%81%84%E6%98%9F%E3%81%AB%E3%81%AA%E3%82%8C%E3%81%9F%E3%82%89/302515876?i=302515885"},
+  {"mood":"wordless","category":"言葉にできん","song":"時間泥棒がやってくる","artist":"MONO NO AWARE","scene":"気づいたら今日が終わっていた帰り道。","reason":"何かをしたようで、何もできていないような時間に。焦りを少しだけ笑える形にしてくれる。","apple":"https://music.apple.com/jp/album/%E6%99%82%E9%96%93%E6%B3%A5%E6%A3%92%E3%81%8C%E3%82%84%E3%81%A3%E3%81%A6%E3%81%8F%E3%82%8B/1480341994?i=1480342006"},
+  {"mood":"light","category":"今日は悪くない","song":"Renaissance","artist":"PUNPEE","scene":"街の明かりが、少しだけ味方に見える帰り道。","reason":"生活に戻っていく感じと、もう一回やってみる感じが同じ温度で鳴る。","apple":"https://music.apple.com/jp/album/renaissance/1291839477?i=1291839821"},
+  {"mood":"notend","category":"まだ終わりたくない","song":"Revenge For Summer Part.2","artist":"JABBA DA FOOTBALL CLUB","scene":"帰ったら終わるから、もう少しだけ外にいたい時。","reason":"季節の終わりみたいな名残惜しさを、軽く持たせてくれる。","apple":"https://music.apple.com/jp/album/revenge-for-summer-part-2/1029799281?i=1029799284"},
+  {"mood":"light","category":"今日は悪くない","song":"I&I","artist":"JABBA DA FOOTBALL CLUB","scene":"少しだけ自分の輪郭が戻ってくる夜。","reason":"全部が解決したわけじゃないけど、歩きながらまあええかと思える曲。","apple":"https://music.apple.com/jp/album/i-i-track-by-hiroki-toyoda/1438700159?i=1438700160"},
+  {"mood":"forward","category":"歩き出したい","song":"Wannabies","artist":"ELLEGARDEN","scene":"ちょっとだけ歩幅が速くなる帰り道。","reason":"考えるより先に足を出したい時に。気持ちを前へ押し出してくれる。","apple":"https://music.apple.com/jp/album/wannabies/1058300499?i=1058301344"},
+  {"mood":"gohome","category":"帰りたくない","song":"ラブホテル","artist":"クリープハイプ","scene":"帰れる場所はあるのに、まだそこへ向かいきれない時間。","reason":"きれいごとでは片付かない気分を、そのまま持って帰れる曲。","apple":"https://music.apple.com/jp/album/%E3%83%A9%E3%83%96%E3%83%9B%E3%83%86%E3%83%AB/679519063?i=679519139"},
+  {"mood":"empty","category":"なんか虚無","song":"Weapons of Mass Destruction","artist":"andymori","scene":"頭の中だけがうるさい帰り道。","reason":"落ち着きたいのに落ち着けない時に。ざわつきを音のまま外へ出してくれる。","apple":"https://music.apple.com/jp/album/weapons-of-mass-destruction/438404764?i=438404768"},
+  {"mood":"empty","category":"なんか虚無","song":"スーパーマンになりたい","artist":"andymori","scene":"強くなりたいけど、今日はそこまで行けない夜。","reason":"なれなさを責めずに、でもどこか諦めきれない気持ちを残してくれる。","apple":"https://music.apple.com/jp/album/%E3%82%B9%E3%83%BC%E3%83%91%E3%83%BC%E3%83%9E%E3%83%B3%E3%81%AB%E3%81%AA%E3%82%8A%E3%81%9F%E3%81%84/438404764?i=438404770"},
+  {"mood":"light","category":"今日は悪くない","song":"サンシャイン","artist":"andymori","scene":"夜なのに、少しだけ朝みたいな気分が残ってる帰り道。","reason":"明るすぎない希望としてちょうどいい。小さい前向きさを拾える曲。","apple":"https://music.apple.com/jp/album/%E3%82%B5%E3%83%B3%E3%82%B7%E3%83%A3%E3%82%A4%E3%83%B3/660147368?i=660147694"},
+  {"mood":"light","category":"今日は悪くない","song":"愛こそはすべて","artist":"The Beatles","scene":"急に世界を信じたくなる、変な帰り道。","reason":"大げさなくらい真っ直ぐでいい日もある。斜に構えた気分を一回ほどいてくれる。","apple":"https://music.apple.com/jp/album/%E6%84%9B%E3%81%93%E3%81%9D%E3%81%AF%E3%81%99%E3%81%B9%E3%81%A6-%E3%82%AA%E3%83%BC%E3%83%AB-%E3%83%A6%E3%83%BC-%E3%83%8B%E3%83%BC%E3%83%89-%E3%82%A4%E3%82%BA-%E3%83%A9%E3%83%B4/1440833098?i=1440833920"},
+  {"mood":"light","category":"今日は悪くない","song":"Life Easy","artist":"Suchmos","scene":"力を抜いて歩ける夜。","reason":"頑張るでも落ち込むでもなく、ただ生活を軽く持つための曲。","apple":"https://music.apple.com/jp/album/life-easy/977043652?i=977044101"},
+  {"mood":"wordless","category":"言葉にできん","song":"言葉がなかったら","artist":"MONO NO AWARE","scene":"言葉にするほどでもない気持ちが残っている夜。","reason":"説明できない感覚を、説明しないまま置いておける曲。","apple":"https://music.apple.com/jp/album/%E8%A8%80%E8%91%89%E3%81%8C%E3%81%AA%E3%81%8B%E3%81%A3%E3%81%9F%E3%82%89/1480341994?i=1480342146"},
+  {"mood":"empty","category":"なんか虚無","song":"NEMUTAI","artist":"DENIMS","scene":"疲れてるのか眠いのか、もうよく分からない帰り道。","reason":"シャキッとしなくていい日に。だるさをだるいまま連れて帰れる。","apple":"https://music.apple.com/jp/album/nemutai/1604522590?i=1604522596"},
+  {"mood":"light","category":"今日は悪くない","song":"お嫁においで2015","artist":"加山雄三 feat. PUNPEE","scene":"夜風がちょっとだけやさしい帰り道。","reason":"生活の中に、少しだけ海風みたいな余白を入れてくれる曲。","apple":"https://music.apple.com/jp/album/%E3%81%8A%E5%AB%81%E3%81%AB%E3%81%8A%E3%81%84%E3%81%A72015-feat-punpee/1208330039?i=1208330192"},
+  {"mood":"light","category":"今日は悪くない","song":"きみは最高","artist":"JABBA DA FOOTBALL CLUB","scene":"理由はないけど、今日は少しだけ悪くなかった。","reason":"大げさな幸せじゃなくて、帰り道に少し口角が上がるくらいでいい日に。","apple":"https://music.apple.com/jp/album/%E3%81%8D%E3%81%BF%E3%81%AF%E6%9C%80%E9%AB%98/1537778367?i=1537778368"},
+  {"mood":"empty","category":"なんか虚無","song":"Killing Heads","artist":"TENDOUJI","scene":"むしゃくしゃを言葉にする前に、音で流す時間。","reason":"きれいに整わない気持ちを、そのまま鳴らしてくれる。","apple":"https://music.apple.com/jp/album/killing-heads/1538288098?i=1538288099"},
+  {"mood":"forward","category":"歩き出したい","song":"Make A Wish","artist":"ELLEGARDEN","scene":"明日を少しだけ信じたい帰り道。","reason":"勢いで気分を変えたい時に。小さく前を向くための曲。","apple":"https://music.apple.com/jp/album/make-a-wish/1058302637?i=1058302641"},
+  {"mood":"station","category":"電車降りた","song":"君の街まで","artist":"ASIAN KUNG-FU GENERATION","scene":"電車を降りて、街の空気に戻る瞬間。","reason":"歩き出す前の、少しだけ前向きな感じにちょうどいい。","apple":"https://music.apple.com/jp/album/%E5%90%9B%E3%81%AE%E8%A1%97%E3%81%BE%E3%81%A7/1536364094?i=1536364097"},
+  {"mood":"station","category":"電車降りた","song":"君の街まで","artist":"JABBA DA FOOTBALL CLUB","scene":"改札を抜けて、いつもの街が少しだけ違って見える時。","reason":"同じタイトルでも、こっちはもう少し生活に近い温度で鳴る。","apple":"https://music.apple.com/jp/album/%E5%90%9B%E3%81%AE%E8%A1%97%E3%81%BE%E3%81%A7/1537501487?i=1537501489"},
+  {"mood":"gohome","category":"帰りたくない","song":"Wonderwall","artist":"Oasis","scene":"誰かに何かを言ってほしいけど、自分からは連絡しない夜。","reason":"真っ直ぐすぎるくらいの名曲を、帰り道の壁にもたれるように聴く。","apple":"https://music.apple.com/jp/album/wonderwall/425109858?i=425109861"},
+  {"mood":"detour","category":"遠回りしたい","song":"ワンダーフォーゲル","artist":"くるり","scene":"まっすぐ帰らず、少しだけ遠回りする時間。","reason":"どこかへ行きたいわけじゃないけど、今いる場所から少し動きたい日に。","apple":"https://music.apple.com/jp/album/%E3%83%AF%E3%83%B3%E3%83%80%E3%83%BC%E3%83%95%E3%82%A9%E3%83%BC%E3%82%B2%E3%83%AB-%E3%83%99%E3%82%B9%E3%83%88-%E3%82%AA%E3%83%96-%E3%81%8F%E3%82%8B%E3%82%8A-remastered/169203402?i=169203477"},
+  {"mood":"forward","category":"歩き出したい","song":"遥か彼方","artist":"ASIAN KUNG-FU GENERATION","scene":"考えるより先に足を動かしたい夜。","reason":"自分を無理やり連れ出す曲。少しだけ速く歩ける。","apple":"https://music.apple.com/jp/album/%E9%81%A5%E3%81%8B%E5%BD%BC%E6%96%B9/1536362314?i=1536362315"},
+  {"mood":"night","category":"夜道がちょうどいい","song":"When You Know","artist":"Neck Deep","scene":"夜の道で、少しだけ心拍数が上がる時。","reason":"重く沈むより、外の空気で気分を動かしたい日に。","apple":"https://music.apple.com/jp/album/when-you-know/1498663190?i=1498663195"},
+  {"mood":"detour","category":"遠回りしたい","song":"Blue Moon","artist":"Supra","scene":"目的地はないけど、足だけは止まっていない夜。","reason":"遠回りの余白に置くと、知らん街まで続いていきそうな曲。","apple":"https://music.apple.com/jp/album/blue-moon/1057367072?i=1057367075"},
+  {"mood":"night","category":"夜道がちょうどいい","song":"Be My Words","artist":"Helsinki Lambda Club","scene":"知らない道じゃないのに、少しだけ別の街みたいに見える夜。","reason":"軽さと寂しさが同じ速度で歩いてくれる。","apple":"https://music.apple.com/jp/album/be-my-words/1692471786?i=1692471921"},
+  {"mood":"night","category":"夜道がちょうどいい","song":"シンセミア","artist":"Helsinki Lambda Club","scene":"コンビニの光だけが妙にきれいに見える夜道。","reason":"夜の湿度と、少し浮いた気分に合う。","apple":"https://music.apple.com/jp/album/%E3%82%B7%E3%83%B3%E3%82%BB%E3%83%9F%E3%82%A2/973030258?i=973030903"},
+  {"mood":"empty","category":"なんか虚無","song":"1984","artist":"andymori","scene":"嫌なことがあったわけじゃないのに、なんか空っぽな帰り道。","reason":"虚無を解決しない。虚無のまま家まで歩かせてくれる。","apple":"https://music.apple.com/jp/album/1984/347792597?i=347792601"},
+  {"mood":"notend","category":"まだ終わりたくない","song":"STAYGOLD, LIFE GOES ON","artist":"JABBA DA FOOTBALL CLUB","scene":"今日がまだ終わってほしくない帰り道。","reason":"明るすぎず暗すぎず、生活が続いていく感じがある。","apple":"https://music.apple.com/jp/album/staygold-life-goes-on/1209994032?i=1209994035"},
+  {"mood":"night","category":"夜道がちょうどいい","song":"ナイトフィッシングイズグッド","artist":"サカナクション","scene":"夜の街で、ひとりだけ深いところを歩いている感じがする時。","reason":"暗いのに沈みきらない。夜をちゃんと夜として楽しませてくれる曲。","apple":"https://music.apple.com/jp/album/%E3%83%8A%E3%82%A4%E3%83%88%E3%83%95%E3%82%A3%E3%83%83%E3%82%B7%E3%83%B3%E3%82%B0%E3%82%A4%E3%82%BA%E3%82%B0%E3%83%83%E3%83%89/271055202?i=271055658"},
+  {"mood":"wordless","category":"言葉にできん","song":"orion","artist":"踊ってばかりの国","scene":"何かを思い出しそうで、思い出さないまま歩いている夜。","reason":"気持ちに名前をつける前の状態に合う。静かに余韻を伸ばしてくれる。","apple":"https://music.apple.com/jp/album/orion/1522467848?i=1522467849"},
+  {"mood":"notend","category":"まだ終わりたくない","song":"バイ・バイ・バイ","artist":"プププランド","scene":"終わらせたいような、終わらせたくないような帰り道。","reason":"軽く手を振るみたいに、今日を閉じるための曲。","apple":"https://music.apple.com/jp/album/%E3%83%90%E3%82%A4-%E3%83%90%E3%82%A4-%E3%83%90%E3%82%A4/1817122563?i=1817122566"},
+  {"mood":"gohome","category":"帰りたくない","song":"cry cry cry","artist":"プププランド","scene":"ちょっとだけ弱いままでいたい夜。","reason":"無理に元気を出さず、情けなさごと連れて帰れる曲。","apple":"https://music.apple.com/jp/album/cry-cry-cry/1817092132?i=1817092258"},
+  {"mood":"light","category":"今日は悪くない","song":"Duet","artist":"ZICO","scene":"帰り道の空気を少しだけ軽くしたい時。","reason":"重さを引きずらず、でも雑に明るくもしない。夜の終わりに置きやすい曲。","apple":"https://music.apple.com/jp/album/duet/1860486730?i=1860486731"}
+]
+
+html_template = """<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
@@ -6,80 +46,43 @@
   <title>結局のところ</title>
   <style>
     :root {
-      --bg: #111111;
-      --card: #1b1b1b;
+      --bg: #0f0f0f;
+      --card: #1a1a1a;
       --card2: #262626;
       --text: #f4f4f4;
       --muted: #a8a8a8;
       --line: #363636;
-      --accent: #f2f2f2;
     }
-
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       min-height: 100vh;
       font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(255,255,255,.08), transparent 32%),
-        linear-gradient(180deg, #181818 0%, #0e0e0e 100%);
+        radial-gradient(circle at top left, rgba(255,255,255,.09), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(255,255,255,.05), transparent 28%),
+        linear-gradient(180deg, #181818 0%, #0d0d0d 100%);
       color: var(--text);
       display: flex;
       justify-content: center;
       padding: 22px 14px;
     }
-
     .app {
-      width: min(100%, 460px);
+      width: min(100%, 470px);
       min-height: calc(100vh - 44px);
       border-radius: 30px;
-      background: rgba(27,27,27,.92);
+      background: rgba(26,26,26,.93);
       box-shadow: 0 24px 80px rgba(0,0,0,.42);
       overflow: hidden;
-      border: 1px solid rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.07);
     }
-
-    header {
-      padding: 28px 24px 18px;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .eyebrow {
-      color: var(--muted);
-      font-size: 13px;
-      letter-spacing: .08em;
-      margin-bottom: 10px;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 31px;
-      letter-spacing: .02em;
-      line-height: 1.2;
-    }
-
-    .lead {
-      margin: 14px 0 0;
-      color: #c8c8c8;
-      line-height: 1.75;
-      font-size: 15px;
-    }
-
+    header { padding: 28px 24px 18px; border-bottom: 1px solid var(--line); }
+    .eyebrow { color: var(--muted); font-size: 12px; letter-spacing: .09em; margin-bottom: 10px; }
+    h1 { margin: 0; font-size: 32px; letter-spacing: .02em; line-height: 1.2; }
+    .lead { margin: 14px 0 0; color: #c8c8c8; line-height: 1.75; font-size: 15px; }
     main { padding: 22px; }
-
-    .section-title {
-      font-size: 14px;
-      color: var(--muted);
-      margin: 0 0 12px;
-    }
-
-    .buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
+    .section-title { font-size: 14px; color: var(--muted); margin: 0 0 12px; }
+    .buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     button {
       border: 1px solid rgba(255,255,255,.08);
       border-radius: 999px;
@@ -91,21 +94,10 @@
       transition: .16s ease;
       -webkit-tap-highlight-color: transparent;
     }
-
-    button:active {
-      transform: scale(.98);
-      background: #444;
-    }
-
-    .free {
-      margin-top: 18px;
-      display: flex;
-      gap: 8px;
-    }
-
+    button:active { transform: scale(.98); background: #454545; }
+    .free { margin-top: 18px; display: flex; gap: 8px; }
     input {
-      flex: 1;
-      min-width: 0;
+      flex: 1; min-width: 0;
       border: 1px solid rgba(255,255,255,.1);
       border-radius: 999px;
       background: #141414;
@@ -114,17 +106,8 @@
       font-size: 14px;
       outline: none;
     }
-
     input::placeholder { color: #777; }
-
-    .small-btn {
-      flex: 0 0 auto;
-      padding-inline: 18px;
-      background: #eeeeee;
-      color: #111;
-      font-weight: 700;
-    }
-
+    .small-btn { flex: 0 0 auto; padding-inline: 18px; background: #eeeeee; color: #111; font-weight: 700; }
     .result {
       display: none;
       margin-top: 24px;
@@ -134,46 +117,22 @@
       border: 1px solid rgba(255,255,255,.07);
       animation: show .24s ease-out;
     }
-
-    @keyframes show {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes show { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .category {
+      display: inline-block;
+      color: #111;
+      background: #f2f2f2;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 14px;
     }
-
-    .scene {
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.7;
-      margin-bottom: 18px;
-    }
-
-    .song {
-      font-size: 27px;
-      font-weight: 800;
-      line-height: 1.25;
-      margin-bottom: 6px;
-    }
-
-    .artist {
-      color: #cccccc;
-      font-size: 16px;
-      margin-bottom: 18px;
-    }
-
-    .reason {
-      color: #e0e0e0;
-      line-height: 1.85;
-      font-size: 15px;
-      white-space: pre-line;
-    }
-
-    .links {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-      flex-wrap: wrap;
-    }
-
+    .scene { color: var(--muted); font-size: 14px; line-height: 1.7; margin-bottom: 18px; }
+    .song { font-size: 27px; font-weight: 800; line-height: 1.25; margin-bottom: 6px; }
+    .artist { color: #cccccc; font-size: 16px; margin-bottom: 18px; }
+    .reason { color: #e0e0e0; line-height: 1.85; font-size: 15px; white-space: pre-line; }
+    .links { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
     a {
       display: inline-flex;
       align-items: center;
@@ -186,33 +145,10 @@
       font-size: 14px;
       font-weight: 700;
     }
-
-    a.secondary {
-      background: transparent;
-      color: #f3f3f3;
-      border: 1px solid rgba(255,255,255,.22);
-    }
-
-    .again {
-      width: 100%;
-      margin-top: 16px;
-      background: transparent;
-      border: 1px solid rgba(255,255,255,.18);
-    }
-
-    .note {
-      margin: 18px 2px 0;
-      color: #828282;
-      font-size: 12px;
-      line-height: 1.7;
-    }
-
-    footer {
-      padding: 0 22px 24px;
-      color: #777;
-      font-size: 12px;
-      line-height: 1.7;
-    }
+    a.secondary { background: transparent; color: #f3f3f3; border: 1px solid rgba(255,255,255,.22); }
+    .again { width: 100%; margin-top: 16px; background: transparent; border: 1px solid rgba(255,255,255,.18); }
+    .meta { margin: 14px 2px 0; color: #828282; font-size: 12px; line-height: 1.7; }
+    footer { padding: 0 22px 24px; color: #777; font-size: 12px; line-height: 1.7; }
   </style>
 </head>
 <body>
@@ -220,15 +156,10 @@
     <header>
       <div class="eyebrow">ONE SONG FOR YOUR WAY HOME</div>
       <h1>結局のところ</h1>
-      <p class="lead">
-        今いる物語に、一曲だけ。<br>
-        気分じゃなくて、帰り道の感じで選びます。
-      </p>
+      <p class="lead">今いる物語に、一曲だけ。<br>気分じゃなくて、帰り道の感じで選びます。</p>
     </header>
-
     <main>
       <p class="section-title">今どんな帰り道？</p>
-
       <div class="buttons">
         <button onclick="recommend('gohome')">家に帰りたくない</button>
         <button onclick="recommend('station')">電車降りた</button>
@@ -236,194 +167,80 @@
         <button onclick="recommend('wordless')">言葉にできん</button>
         <button onclick="recommend('night')">夜道がちょうどいい</button>
         <button onclick="recommend('notend')">まだ終わりたくない</button>
-        <button onclick="recommend('light')">今日は悪くない</button>
         <button onclick="recommend('empty')">なんか虚無</button>
+        <button onclick="recommend('light')">今日は悪くない</button>
+        <button onclick="recommend('forward')">歩き出したい</button>
+        <button onclick="recommend('all')">完全ランダム</button>
       </div>
-
       <div class="free">
         <input id="freeText" type="text" placeholder="一言で今の感じを書く" />
         <button class="small-btn" onclick="recommendFromText()">選ぶ</button>
       </div>
-
       <div class="result" id="result">
+        <div class="category" id="category"></div>
         <div class="scene" id="scene"></div>
         <div class="song" id="song"></div>
         <div class="artist" id="artist"></div>
         <div class="reason" id="reason"></div>
         <div class="links">
-          <a id="youtube" href="#" target="_blank" rel="noopener">YouTubeで聴く</a>
-          <a id="apple" class="secondary" href="#" target="_blank" rel="noopener">Apple Musicで探す</a>
+          <a id="apple" href="#" target="_blank" rel="noopener">Apple Musicで聴く</a>
+          <a id="youtube" class="secondary" href="#" target="_blank" rel="noopener">YouTubeで探す</a>
         </div>
         <button class="again" onclick="recommend(lastMood)">もう一曲だけ</button>
       </div>
-
-      <p class="note">
-        ※これはプロトタイプです。曲はスクショの「結局のところ」から組み込んでいます。
-      </p>
+      <p class="meta" id="meta"></p>
     </main>
-
-    <footer>
-      曲そのものより、その曲を聴きたくなる瞬間を集めるための小さな入口。
-    </footer>
+    <footer>曲そのものより、その曲を聴きたくなる瞬間を集めるための小さな入口。</footer>
   </div>
-
   <script>
     let lastMood = "night";
+    let lastSongKey = "";
+    const songs = __SONGS__;
+    document.getElementById("meta").textContent = "収録曲：" + songs.length + "曲 / v1.0";
 
-    const songs = {
-      gohome: [
-        {
-          scene: "家までの道が、少しだけ長く感じる帰り道。",
-          song: "誰にも見つけられない星になれたら",
-          artist: "andymori",
-          reason: "誰かに見つけてほしいような、見つけられたくないような夜に。\nまっすぐ帰るだけの日にも、少しだけ物語が残る。",
-        },
-        {
-          scene: "帰れる場所はあるのに、まだそこへ向かいきれない時間。",
-          song: "ラブホテル",
-          artist: "クリープハイプ",
-          reason: "きれいごとでは片付かない気分を、そのまま持って帰れる曲。",
-        }
-      ],
-      station: [
-        {
-          scene: "電車を降りて、街の空気に戻る瞬間。",
-          song: "君の街まで",
-          artist: "ASIAN KUNG-FU GENERATION",
-          reason: "歩き出す前の、少しだけ前向きな感じにちょうどいい。",
-        },
-        {
-          scene: "改札を抜けて、いつもの街が少しだけ違って見える時。",
-          song: "君の街まで",
-          artist: "JABBA DA FOOTBALL CLUB",
-          reason: "同じタイトルでも、こっちはもう少し生活に近い温度で鳴る。",
-        }
-      ],
-      detour: [
-        {
-          scene: "まっすぐ帰らず、少しだけ遠回りする時間。",
-          song: "ワンダーフォーゲル",
-          artist: "くるり",
-          reason: "どこかへ行きたいわけじゃないけど、今いる場所から少し動きたい日に。",
-        },
-        {
-          scene: "目的地はないけど、足だけは止まっていない夜。",
-          song: "Blue Moon",
-          artist: "Supra",
-          reason: "遠回りの余白に置くと、知らん街まで続いていきそうな曲。",
-        }
-      ],
-      wordless: [
-        {
-          scene: "言葉にするほどでもない気持ちが残っている夜。",
-          song: "言葉がなかったら",
-          artist: "MONO NO AWARE",
-          reason: "説明できない感覚を、説明しないまま置いておける曲。",
-        },
-        {
-          scene: "何か言いたいのに、別に誰にも送る文章がない時。",
-          song: "時間泥棒がやってくる",
-          artist: "MONO NO AWARE",
-          reason: "気づいたら過ぎている時間の中に、少しだけ意味を作ってくれる。",
-        }
-      ],
-      night: [
-        {
-          scene: "コンビニの光だけが妙にきれいに見える夜道。",
-          song: "シンセミア",
-          artist: "Helsinki Lambda Club",
-          reason: "夜の湿度と、少し浮いた気分に合う。",
-        },
-        {
-          scene: "知らない道じゃないのに、少しだけ別の街みたいに見える夜。",
-          song: "Be My Words",
-          artist: "Helsinki Lambda Club",
-          reason: "軽さと寂しさが同じ速度で歩いてくれる。",
-        }
-      ],
-      notend: [
-        {
-          scene: "今日がまだ終わってほしくない帰り道。",
-          song: "STAYGOLD, LIFE GOES ON",
-          artist: "JABBA DA FOOTBALL CLUB",
-          reason: "明るすぎず暗すぎず、生活が続いていく感じがある。",
-        },
-        {
-          scene: "帰ったら終わるから、もう少しだけ外にいたい時。",
-          song: "Revenge For Summer Part.2",
-          artist: "JABBA DA FOOTBALL CLUB",
-          reason: "季節の終わりみたいな名残惜しさを、軽く持たせてくれる。",
-        }
-      ],
-      light: [
-        {
-          scene: "理由はないけど、今日は少しだけ悪くなかった。",
-          song: "きみは最高",
-          artist: "JABBA DA FOOTBALL CLUB",
-          reason: "大げさな幸せじゃなくて、帰り道に少し口角が上がるくらいでいい日に。",
-        },
-        {
-          scene: "風がちょうどよくて、生活が少しマシに見える時。",
-          song: "Life Easy",
-          artist: "Suchmos",
-          reason: "力を抜いて歩くための曲。今日はこれくらいでいい。",
-        }
-      ],
-      empty: [
-        {
-          scene: "嫌なことがあったわけじゃないのに、なんか空っぽな帰り道。",
-          song: "1984",
-          artist: "andymori",
-          reason: "虚無を埋めるというより、虚無のまま歩かせてくれる曲。",
-        },
-        {
-          scene: "頭の中だけうるさくて、街の音が遠くなる夜。",
-          song: "スーパーマンになりたい",
-          artist: "andymori",
-          reason: "強くなりたい気持ちと、なれなさを同時に鳴らしてくれる。",
-        }
-      ]
-    };
+    function makeSearchUrl(song, artist) {
+      return "https://www.youtube.com/results?search_query=" + encodeURIComponent(artist + " " + song);
+    }
 
-    function makeSearchUrl(platform, song, artist) {
-      const q = encodeURIComponent(artist + " " + song);
-      if (platform === "youtube") return "https://www.youtube.com/results?search_query=" + q;
-      return "https://music.apple.com/jp/search?term=" + q;
+    function pick(list) {
+      if (list.length === 1) return list[0];
+      let item = list[Math.floor(Math.random() * list.length)];
+      if ((item.artist + "::" + item.song) === lastSongKey) {
+        item = list[Math.floor(Math.random() * list.length)];
+      }
+      lastSongKey = item.artist + "::" + item.song;
+      return item;
     }
 
     function recommend(mood) {
       lastMood = mood || lastMood;
-      const list = songs[lastMood] || songs.night;
-      const item = list[Math.floor(Math.random() * list.length)];
-
+      const list = lastMood === "all" ? songs : songs.filter(item => item.mood === lastMood);
+      const item = pick(list.length ? list : songs);
+      document.getElementById("category").textContent = item.category;
       document.getElementById("scene").textContent = item.scene;
       document.getElementById("song").textContent = item.song;
       document.getElementById("artist").textContent = item.artist;
       document.getElementById("reason").textContent = item.reason;
-      document.getElementById("youtube").href = makeSearchUrl("youtube", item.song, item.artist);
-      document.getElementById("apple").href = makeSearchUrl("apple", item.song, item.artist);
-
+      document.getElementById("apple").href = item.apple;
+      document.getElementById("youtube").href = makeSearchUrl(item.song, item.artist);
       document.getElementById("result").style.display = "block";
       document.getElementById("result").scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
     function recommendFromText() {
       const text = document.getElementById("freeText").value.trim();
-
-      if (!text) {
-        recommend("night");
-        return;
-      }
+      if (!text) { recommend("night"); return; }
 
       const rules = [
         { keys: ["帰りたく", "帰りたない", "家いや", "帰りたくない"], mood: "gohome" },
         { keys: ["電車", "駅", "改札", "降りた"], mood: "station" },
-        { keys: ["遠回り", "歩きたい", "散歩", "歩く"], mood: "detour" },
-        { keys: ["言葉", "説明", "わからん", "なんとも"], mood: "wordless" },
-        { keys: ["夜", "コンビニ", "暗い", "夜道"], mood: "night" },
-        { keys: ["終わりたく", "まだ", "帰ったら終わる"], mood: "notend" },
-        { keys: ["悪くない", "よかった", "最高", "いい日"], mood: "light" },
-        { keys: ["虚無", "空っぽ", "だるい", "疲れ", "何も"], mood: "empty" },
+        { keys: ["遠回り", "歩きたい", "散歩", "歩く", "一駅"], mood: "detour" },
+        { keys: ["言葉", "説明", "わからん", "なんとも", "言えん", "言えない"], mood: "wordless" },
+        { keys: ["夜", "コンビニ", "暗い", "夜道", "深夜"], mood: "night" },
+        { keys: ["終わりたく", "まだ", "帰ったら終わる", "名残惜しい"], mood: "notend" },
+        { keys: ["虚無", "空っぽ", "だるい", "疲れ", "何も", "眠い"], mood: "empty" },
+        { keys: ["悪くない", "よかった", "最高", "いい日", "まあええ", "まし"], mood: "light" },
+        { keys: ["前向き", "歩き出", "行ける", "走りたい", "変えたい"], mood: "forward" }
       ];
 
       const hit = rules.find(rule => rule.keys.some(key => text.includes(key)));
@@ -434,3 +251,9 @@
   </script>
 </body>
 </html>
+"""
+
+html = html_template.replace("__SONGS__", json.dumps(songs, ensure_ascii=False, indent=6))
+path = Path("/mnt/data/kekkyoku-no-tokoro-v1.html")
+path.write_text(html, encoding="utf-8")
+path.as_posix()
